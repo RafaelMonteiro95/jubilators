@@ -1,6 +1,6 @@
 # Simple makefile
 
-NAME=lexical_parser
+NAME=gcc-
 
 LEX_SRC=$(wildcard src/*.lex) $(wildcard src/*.l)
 C_SRC=$(wildcard src/*.c)
