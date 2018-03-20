@@ -20,4 +20,7 @@ c_compile:
 	$(CC) $(CFLAGS) $(C_SRC) -o $(NAME)
 
 clean:
-	~rm -f build/*
+	~rm -f $(NAME)
+
+run:
+	./$(NAME)
