@@ -18,7 +18,7 @@ C_SRC=$(wildcard src/*.c)
 CC=gcc
 LEX_CC=flex
 
-CFLAGS=-O3 
+CFLAGS=-O3 -lfl
 LEXFLAGS=
 
 # C- things
