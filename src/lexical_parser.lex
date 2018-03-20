@@ -26,9 +26,16 @@ real 		((\+|\-)?{digit}+(\.{digit}+)?(e(\+|\-)?{digit}+(\.{digit}+)?)?f?)
 /*hex		(0[xX]([0-9]|[A-Fa-f])+) */
 hex			(0[xX]({digit}|[A-Fa-f])+)
 
+brackets	(\[|\]|\(|\)|\{|\})
+binSymbol	(\+|\-|\*|\/|>|<|>=|<=|=|==)
+
+reserved	(if|else|while||return|input|output|int|void)
+punctuation	(,|;|\\)
+
 /* End Definitions */
 
 %% /* Rules */
+
 
 digit		{ printf("digit found!"); }
 alpha		{ printf("alpha found!"); }
