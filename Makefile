@@ -38,8 +38,8 @@ cminus_compile:
 	./$(NAME) $(RUN_ARGS) -o $(CMINUS_BUILD)/$(NAME)
 
 clean: 
-	~rm -f $(NAME)
-	~rm -rf $(CMINUS_BUILD)
+	-rm -f $(NAME)
+	-rm -rf $(CMINUS_BUILD)
 
 run:
 	./$(NAME) 

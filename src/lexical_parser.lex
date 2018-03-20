@@ -9,42 +9,61 @@
  *
  */
 
+
+%{ /* C code header*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int lineno = 1;
+
+%} /* End C code header */
+
 /* Definitions */
 
+/* Base */
 digit		[0-9]
 alpha		[A-Za-z]
 alnum		({alpha}|{digit})
+
+/* Words and identifiers */
 id			({alpha}+)
-blank		([ \t\n])
+reserved	(if|else|while|return|input|output|int|void)
+whitespace	([ \t])
+newline		([\n]|\r\n)
 
+/* Numbers */
 /*integer	((\+|\-)?[0-9]+) */
-integer		((\+|\-)?{digit}+) 
-
 /*real 		((\+|\-)?[0-9]+(\.[0-9]+)?(e(\+|\-)?[0-9]+(\.[0-9]+)?)?f?) */
-real 		((\+|\-)?{digit}+(\.{digit}+)?(e(\+|\-)?{digit}+(\.{digit}+)?)?f?)
-
 /*hex		(0[xX]([0-9]|[A-Fa-f])+) */
+integer		((\+|\-)?{digit}+) 
+real 		((\+|\-)?{digit}+(\.{digit}+)?(e(\+|\-)?{digit}+(\.{digit}+)?)?f?)
 hex			(0[xX]({digit}|[A-Fa-f])+)
 
+/* Operators and punctuation */
+punctuation	(,|;|\\)
 brackets	(\[|\]|\(|\)|\{|\})
 binSymbol	(\+|\-|\*|\/|>|<|>=|<=|=|==)
-
-reserved	(if|else|while||return|input|output|int|void)
-punctuation	(,|;|\\)
 
 /* End Definitions */
 
 %% /* Rules */
 
+{reserved}				{ printf("keyword found!\n"); }
+({brackets}|{punctuation})	{ printf("punctuation found!\n"); }
+{binSymbol}				{ printf("operator found!\n"); }
 
-digit		{ printf("digit found!"); }
-alpha		{ printf("alpha found!"); }
-alnum		{ printf("alnum found!"); }
-id			{ printf("id found!"); }
-blank		{ printf("blank found!"); }
-integer		{ printf("integer found!"); }
-real		{ printf("real found!"); }
-hex			{ printf("hex found!"); }
+{digit}					{ printf("digit found!\n"); }
+{alpha}					{ printf("alpha found!\n"); }
+{alnum}					{ printf("alnum found!\n"); }
+
+{id}					{ printf("id found!\n"); }
+{integer}				{ printf("integer found!\n"); }
+{real}					{ printf("real found!\n"); }
+{hex}					{ printf("hex found!\n"); }
+{whitespace}			{ /* Do nothing (consume whitespaces) */ }
+{newline}				{ lineno++; }
+.						{ /* Error */ printf("Error in line %d\n", lineno); }
 
 %% /* End Rules */
 
