@@ -28,7 +28,7 @@ CMINUS_BUILD=c-_build
 all: clean lex_compile c_compile
 	
 lex_compile:
-	$(LEX_CC) $(LEX_SRC)
+	$(LEX_CC) -o src/$(NAME).yy.c $(LEX_SRC) 
 
 c_compile:
 	$(CC) $(CFLAGS) $(C_SRC) -o $(NAME)
