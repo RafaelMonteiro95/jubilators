@@ -11,6 +11,22 @@
 
 /* Definitions */
 
+digit		[0-9]
+alpha		[A-Za-z]
+alnum		({alpha}|{digit})
+
+/*integer	((\+|\-)?[0-9]+) */
+integer		((\+|\-)?{digit}+) 
+
+/*real 		((\+|\-)?[0-9]+(\.[0-9]+)?(e(\+|\-)?[0-9]+(\.[0-9]+)?)?f?) */
+real 		((\+|\-)?{digit}+(\.{digit}+)?(e(\+|\-)?{digit}+(\.{digit}+)?)?f?)
+
+/*hex		(0[xX]([0-9]|[A-Fa-f])+) */
+hex			(0[xX]({digit}|[A-Fa-f])+)
+
+
+
+
 %%
 
 /* Rules */
