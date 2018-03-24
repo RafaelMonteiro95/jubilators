@@ -18,7 +18,7 @@
 
 #include "globals.h"
 
-int lineno = 1;
+int lineno = 0;
 char *current_line = NULL;
 
 bool line_cmt = false;
@@ -98,8 +98,18 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 					return L_MULTI_LINE_COMMENT; 
 				}
 "*/"			{ 
+					// Nested or unmatched comment block check
+					if(!blk_cmt) {
+						int i = strlen(current_line);
+						while((current_line[i++] = input()) != '\n');
+						current_line[i] = '\0';
+						lineno++;
+						
+						return ERROR;
+					}
+
 					blk_cmt = false;
-					return R_MULTI_LINE_COMMENT; 
+					return R_MULTI_LINE_COMMENT;
 				}
 
 {whitespace}	{ 
@@ -119,12 +129,7 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 {id}			{ return (!line_cmt && !blk_cmt) ? ID : COMMENT; }
 <<EOF>>			{ return LEX_EOF; }
 .				{ 
-					if(line_cmt || blk_cmt) return COMMENT;
-					
-					int i = strlen(current_line);
-					while((current_line[i++] = input()) != '\n');
-					current_line[i] = '\0';
-					
+					if(line_cmt || blk_cmt) return COMMENT;					
 					return ERROR;
 				}
 
@@ -227,9 +232,16 @@ int main(int argc, char *argv[]){
 			break;
 
 		case ERROR:
+			
+			int i = strlen(current_line);
+			while((current_line[i++] = input()) != '\n');
+			current_line[i] = '\0';
+			lineno++; // Count found newline
+			
 			fprintf(stderr, ANSI_red "Error" ANSI_reset " (line %d): %s", lineno, current_line);
 			error = true;
 			errorCount++;
+
 			break;
 		}
   	}
