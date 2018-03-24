@@ -14,13 +14,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "globals.h"
 
 int lineno = 1;
+char *current_line = NULL;
+
 bool line_cmt = false;
 bool blk_cmt = false;
-char *current_line = NULL;
+
+bool error = false;
+int errorCount = 0;
+
 %} /* End C code header */
 
 /* Definitions */
@@ -53,34 +59,34 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 
 %% /* Rules */
 
-"if"			{ if(!line_cmt && ! blk_cmt) return IF; }
-"else"			{ if(!line_cmt && ! blk_cmt) return ELSE; }
-"while"			{ if(!line_cmt && ! blk_cmt) return WHILE; }
-"return"		{ if(!line_cmt && ! blk_cmt) return RETURN; }
-"input"			{ if(!line_cmt && ! blk_cmt) return INPUT; }
-"output"		{ if(!line_cmt && ! blk_cmt) return OUTPUT; }
-"int"			{ if(!line_cmt && ! blk_cmt) return TYPE_INT; }
-"void"			{ if(!line_cmt && ! blk_cmt) return TYPE_VOID; }
-"+"				{ if(!line_cmt && ! blk_cmt) return PLUS; }
-"-"				{ if(!line_cmt && ! blk_cmt) return MINUS; }
-"*"				{ if(!line_cmt && ! blk_cmt) return MULTIPLY; }
-"/"				{ if(!line_cmt && ! blk_cmt) return DIVIDE; }
-">"				{ if(!line_cmt && ! blk_cmt) return GREATER; }
-"<"				{ if(!line_cmt && ! blk_cmt) return LESSER; }
-">="			{ if(!line_cmt && ! blk_cmt) return GREATER_EQUAL; }
-"<="			{ if(!line_cmt && ! blk_cmt) return LESSER_EQUAL; }
-"=="			{ if(!line_cmt && ! blk_cmt) return EQUALS; }
-"!="			{ if(!line_cmt && ! blk_cmt) return DIFFERENT; }
-"="				{ if(!line_cmt && ! blk_cmt) return ASSIGN; }
-","				{ if(!line_cmt && ! blk_cmt) return COMMA; }
-";"				{ if(!line_cmt && ! blk_cmt) return SEMICOLON; }
-"\\"			{ if(!line_cmt && ! blk_cmt) return BACKSLASH; }
-"["				{ if(!line_cmt && ! blk_cmt) return L_SQUARE_BRACKET; }
-"]"				{ if(!line_cmt && ! blk_cmt) return R_SQUARE_BRACKET; }
-"{"				{ if(!line_cmt && ! blk_cmt) return L_CURLY_BRACKET; }
-"}"				{ if(!line_cmt && ! blk_cmt) return R_CURLY_BRACKET; }
-"("				{ if(!line_cmt && ! blk_cmt) return L_PARENS; }
-")"				{ if(!line_cmt && ! blk_cmt) return R_PARENS; }
+"if"			{ return (!line_cmt && !blk_cmt) ? IF : COMMENT; }
+"else"			{ return (!line_cmt && !blk_cmt) ? ELSE : COMMENT; }
+"while"			{ return (!line_cmt && !blk_cmt) ? WHILE : COMMENT; }
+"return"		{ return (!line_cmt && !blk_cmt) ? RETURN : COMMENT; }
+"input"			{ return (!line_cmt && !blk_cmt) ? INPUT : COMMENT; }
+"output"		{ return (!line_cmt && !blk_cmt) ? OUTPUT : COMMENT; }
+"int"			{ return (!line_cmt && !blk_cmt) ? TYPE_INT : COMMENT; }
+"void"			{ return (!line_cmt && !blk_cmt) ? TYPE_VOID : COMMENT; }
+"+"				{ return (!line_cmt && !blk_cmt) ? PLUS : COMMENT; }
+"-"				{ return (!line_cmt && !blk_cmt) ? MINUS : COMMENT; }
+"*"				{ return (!line_cmt && !blk_cmt) ? MULTIPLY : COMMENT; }
+"/"				{ return (!line_cmt && !blk_cmt) ? DIVIDE : COMMENT; }
+">"				{ return (!line_cmt && !blk_cmt) ? GREATER : COMMENT; }
+"<"				{ return (!line_cmt && !blk_cmt) ? LESSER : COMMENT; }
+">="			{ return (!line_cmt && !blk_cmt) ? GREATER_EQUAL : COMMENT; }
+"<="			{ return (!line_cmt && !blk_cmt) ? LESSER_EQUAL : COMMENT; }
+"=="			{ return (!line_cmt && !blk_cmt) ? EQUALS : COMMENT; }
+"!="			{ return (!line_cmt && !blk_cmt) ? DIFFERENT : COMMENT; }
+"="				{ return (!line_cmt && !blk_cmt) ? ASSIGN : COMMENT; }
+","				{ return (!line_cmt && !blk_cmt) ? COMMA : COMMENT; }
+";"				{ return (!line_cmt && !blk_cmt) ? SEMICOLON : COMMENT; }
+"\\"			{ return (!line_cmt && !blk_cmt) ? BACKSLASH : COMMENT; }
+"["				{ return (!line_cmt && !blk_cmt) ? L_SQUARE_BRACKET : COMMENT; }
+"]"				{ return (!line_cmt && !blk_cmt) ? R_SQUARE_BRACKET : COMMENT; }
+"{"				{ return (!line_cmt && !blk_cmt) ? L_CURLY_BRACKET : COMMENT; }
+"}"				{ return (!line_cmt && !blk_cmt) ? R_CURLY_BRACKET : COMMENT; }
+"("				{ return (!line_cmt && !blk_cmt) ? L_PARENS : COMMENT; }
+")"				{ return (!line_cmt && !blk_cmt) ? R_PARENS : COMMENT; }
 
 "//"			{ 
 					line_cmt = true;
@@ -96,18 +102,23 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 					return R_MULTI_LINE_COMMENT; 
 				}
 
-{whitespace}	{ line_cmt = false; }
+{whitespace}	{ 
+					line_cmt = false; 
+					return WHITESPACE;
+				}
+
 {newline}		{ 
 					current_line[0] = '\0'; // Clear current line
 					lineno++; 
+					return NEWLINE;
 				}
 
-{integer}		{ if(!line_cmt && ! blk_cmt) return INTEGER; }
-{real}			{ if(!line_cmt && ! blk_cmt) return REAL; }
-{hex}			{ if(!line_cmt && ! blk_cmt) return HEXADECIMAL; }
-{id}			{ if(!line_cmt && ! blk_cmt) return ID; }
+{integer}		{ return (!line_cmt && !blk_cmt) ? INTEGER : COMMENT; }
+{real}			{ return (!line_cmt && !blk_cmt) ? REAL : COMMENT; }
+{hex}			{ return (!line_cmt && !blk_cmt) ? HEXADECIMAL : COMMENT; }
+{id}			{ return (!line_cmt && !blk_cmt) ? ID : COMMENT; }
 <<EOF>>			{ return LEX_EOF; }
-.				{ return ERROR; }
+.				{ return (!line_cmt && !blk_cmt) ? ERROR : COMMENT; }
 
 %% /* End Rules */
 
@@ -129,6 +140,7 @@ void SetupLex(FILE *input, FILE *output){
 Token GetToken(char *str){
 
 	Token token = yylex();
+
 	strcat(current_line, yytext);
 	strncpy(str, yytext, MAX_TOKEN_LEN);
 	return token;
@@ -149,9 +161,10 @@ int main(int argc, char *argv[]){
   		return -1;
   	}
 
+  	clock_t clocks = clock();
+  	char *token_str = (char *) malloc(sizeof(char)*MAX_TOKEN_LEN);
   	current_line = (char *) malloc(sizeof(char)*MAX_LINE_LEN);
   	current_line[0] = '\0'; // Safety
-  	char *token_str = (char *) malloc(sizeof(char)*MAX_TOKEN_LEN);
   	Token token_type;
 
   	SetupLex(fp, stdout);
@@ -261,6 +274,8 @@ int main(int argc, char *argv[]){
 		case R_PARENS:
 			break;
 
+		case COMMENT: break;
+		case SINGLE_LINE_COMMENT: break;
 		case L_MULTI_LINE_COMMENT:
 			break;
 		
@@ -269,18 +284,29 @@ int main(int argc, char *argv[]){
 
 		case LEX_EOF:
 			finished = true;
-			yyterminate();
+			// yyterminate();
 			break;
 
 		case ERROR:
 			fprintf(stderr, ANSI_red "Error" ANSI_reset " (line %d): %s\n", lineno, current_line);
+			error = true;
+			errorCount++;
 			break;
 		}
+  	}
+
+  	if(error){
+  		printf("%d errors found.\n", errorCount);
+  	} else {
+  		double time = (double) (clock() - clocks)/CLOCKS_PER_SEC;
+  		printf("Compilation successful in %lf seconds.\n", time);
   	}
 
 	free(token_str);
 	free(current_line);
 	fclose(fp);
+	
+	yyterminate();
 
 	return 0;
 }
