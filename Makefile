@@ -14,6 +14,7 @@ endif
 
 LEX_SRC=$(wildcard src/*.lex) $(wildcard src/*.l)
 C_SRC=$(wildcard src/*.c)
+C_DEP=$(wildcard include/*.h)
 
 CC=gcc
 LEX_CC=flex
@@ -31,7 +32,7 @@ lex_compile:
 	$(LEX_CC) -o src/$(NAME).yy.c $(LEX_SRC) 
 
 c_compile:
-	$(CC) $(CFLAGS) $(C_SRC) -o $(NAME)
+	$(CC) $(CFLAGS) $(C_SRC) -o $(NAME) -I./include
 
 cminus_compile:
 	@mkdir $(CMINUS_BUILD)
@@ -42,7 +43,7 @@ clean:
 	-rm -rf $(CMINUS_BUILD)
 
 run:
-	./$(NAME) 
+	./$(NAME) $(RUN_ARGS)
 
 zip:
 	zip -r $(NAME).zip *
