@@ -183,44 +183,47 @@ int main(int argc, char *argv[]){
 		token_type = GetToken(token_str);
 		switch(token_type){
 		
-		case ID: break;
-		case INTEGER: break;
-		case REAL: break;
-		case HEXADECIMAL: break;
-		case IF: break;
-		case ELSE: break;
-		case WHILE: break;
-		case RETURN: break;
-		case INPUT: break;
-		case OUTPUT: break;
-		case TYPE_INT: break;
-		case TYPE_VOID: break;
-		case NEWLINE: break;
-		case WHITESPACE: break;
-		case PLUS: break;
-		case MINUS: break;
-		case MULTIPLY: break;
-		case DIVIDE: break;
-		case GREATER: break;
-		case LESSER: break;
-		case GREATER_EQUAL: break;
-		case LESSER_EQUAL: break;
-		case EQUALS: break;
-		case DIFFERENT: break;
-		case ASSIGN: break;
-		case COMMA: break;
-		case SEMICOLON: break;
-		case BACKSLASH: break;
-		case L_SQUARE_BRACKET: break;
-		case R_SQUARE_BRACKET: break;
-		case L_CURLY_BRACKET: break;
-		case R_CURLY_BRACKET: break;
-		case L_PARENS: break;
-		case R_PARENS: break;
-		case COMMENT: break;
-		case SINGLE_LINE_COMMENT: break;
+		case ID: 
+		case INTEGER: 
+		case REAL: 
+		case HEXADECIMAL: 
+		case IF: 
+		case ELSE: 
+		case WHILE: 
+		case RETURN: 
+		case INPUT: 
+		case OUTPUT: 
+		case TYPE_INT: 
+		case TYPE_VOID: 
+		case PLUS: 
+		case MINUS: 
+		case MULTIPLY: 
+		case DIVIDE: 
+		case GREATER: 
+		case LESSER: 
+		case GREATER_EQUAL: 
+		case LESSER_EQUAL: 
+		case EQUALS: 
+		case DIFFERENT: 
+		case ASSIGN: 
+		case COMMA: 
+		case SEMICOLON: 
+		case BACKSLASH: 
+		case L_SQUARE_BRACKET: 
+		case R_SQUARE_BRACKET: 
+		case L_CURLY_BRACKET: 
+		case R_CURLY_BRACKET: 
+		case L_PARENS: 
+		case R_PARENS:
+			fprintf(yyout, "%s\n", token_str);
+			break;
+		
 		case L_MULTI_LINE_COMMENT: break;
 		case R_MULTI_LINE_COMMENT: break;
+		case NEWLINE: break;
+		case WHITESPACE: break;
+		case COMMENT: break;
+		case SINGLE_LINE_COMMENT: break;
 
 		case LEX_EOF:
 			finished = true;
