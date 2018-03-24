@@ -118,7 +118,15 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 {hex}			{ return (!line_cmt && !blk_cmt) ? HEXADECIMAL : COMMENT; }
 {id}			{ return (!line_cmt && !blk_cmt) ? ID : COMMENT; }
 <<EOF>>			{ return LEX_EOF; }
-.				{ return (!line_cmt && !blk_cmt) ? ERROR : COMMENT; }
+.				{ 
+					if(line_cmt || blk_cmt) return COMMENT;
+					
+					int i = strlen(current_line);
+					while((current_line[i++] = input()) != '\n');
+					current_line[i] = '\0';
+					
+					return ERROR;
+				}
 
 %% /* End Rules */
 
@@ -141,7 +149,7 @@ Token GetToken(char *str){
 
 	Token token = yylex();
 
-	strcat(current_line, yytext);
+	if(token != ERROR) strcat(current_line, yytext);
 	strncpy(str, yytext, MAX_TOKEN_LEN);
 	return token;
 }
@@ -175,120 +183,51 @@ int main(int argc, char *argv[]){
 		token_type = GetToken(token_str);
 		switch(token_type){
 		
-		case ID:
-			break;
-		
-		case INTEGER:
-			break;
-		
-		case REAL:
-			break;
-		
-		case HEXADECIMAL:
-			break;
-		
-		case IF:
-			break;
-		
-		case ELSE:
-			break;
-		
-		case WHILE:
-			break;
-		
-		case RETURN:
-			break;
-		
-		case INPUT:
-			break;
-		
-		case OUTPUT:
-			break;
-		
-		case TYPE_INT:
-			break;
-		
-		case TYPE_VOID:
-			break;
-		
-		case NEWLINE: break;	// Shouldnt happen
-		case WHITESPACE: break;	// Shouldnt happen
-		
-		case PLUS:
-			break;
-		
-		case MINUS:
-			break;
-		
-		case MULTIPLY:
-			break;
-		
-		case DIVIDE:
-			break;
-		
-		case GREATER:
-			break;
-		
-		case LESSER:
-			break;
-		
-		case GREATER_EQUAL:
-			break;
-		
-		case LESSER_EQUAL:
-			break;
-		
-		case EQUALS:
-			break;
-		
-		case DIFFERENT:
-			break;
-		
-		case ASSIGN:
-			break;
-		
-		case COMMA:
-			break;
-		
-		case SEMICOLON:
-			break;
-		
-		case BACKSLASH:
-			break;
-		
-		case L_SQUARE_BRACKET:
-			break;
-		
-		case R_SQUARE_BRACKET:
-			break;
-		
-		case L_CURLY_BRACKET:
-			break;
-		
-		case R_CURLY_BRACKET:
-			break;
-		
-		case L_PARENS:
-			break;
-		
-		case R_PARENS:
-			break;
-
+		case ID: break;
+		case INTEGER: break;
+		case REAL: break;
+		case HEXADECIMAL: break;
+		case IF: break;
+		case ELSE: break;
+		case WHILE: break;
+		case RETURN: break;
+		case INPUT: break;
+		case OUTPUT: break;
+		case TYPE_INT: break;
+		case TYPE_VOID: break;
+		case NEWLINE: break;
+		case WHITESPACE: break;
+		case PLUS: break;
+		case MINUS: break;
+		case MULTIPLY: break;
+		case DIVIDE: break;
+		case GREATER: break;
+		case LESSER: break;
+		case GREATER_EQUAL: break;
+		case LESSER_EQUAL: break;
+		case EQUALS: break;
+		case DIFFERENT: break;
+		case ASSIGN: break;
+		case COMMA: break;
+		case SEMICOLON: break;
+		case BACKSLASH: break;
+		case L_SQUARE_BRACKET: break;
+		case R_SQUARE_BRACKET: break;
+		case L_CURLY_BRACKET: break;
+		case R_CURLY_BRACKET: break;
+		case L_PARENS: break;
+		case R_PARENS: break;
 		case COMMENT: break;
 		case SINGLE_LINE_COMMENT: break;
-		case L_MULTI_LINE_COMMENT:
-			break;
-		
-		case R_MULTI_LINE_COMMENT:
-			break;
+		case L_MULTI_LINE_COMMENT: break;
+		case R_MULTI_LINE_COMMENT: break;
 
 		case LEX_EOF:
 			finished = true;
-			// yyterminate();
 			break;
 
 		case ERROR:
-			fprintf(stderr, ANSI_red "Error" ANSI_reset " (line %d): %s\n", lineno, current_line);
+			fprintf(stderr, ANSI_red "Error" ANSI_reset " (line %d): %s", lineno, current_line);
 			error = true;
 			errorCount++;
 			break;
@@ -305,7 +244,7 @@ int main(int argc, char *argv[]){
 	free(token_str);
 	free(current_line);
 	fclose(fp);
-	
+
 	yyterminate();
 
 	return 0;

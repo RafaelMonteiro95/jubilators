@@ -1,5 +1,8 @@
 /* Este programa calcula a soma de dois números fornecidos 
 pelo usuário */
+
+// single line comment
+
 void main(){
 	
 	int x;
