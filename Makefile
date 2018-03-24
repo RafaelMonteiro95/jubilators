@@ -19,17 +19,17 @@ C_DEP=$(wildcard include/*.h)
 CC=gcc
 LEX_CC=flex
 
-CFLAGS=-O3 -lfl
+CFLAGS=-O3 -lfl -g
 LEXFLAGS=
 
 # C- things
 CMINUS_SRC=$(wildcard c-/*.c-)
 CMINUS_BUILD=c-_build
 
-all: clean lex_compile c_compile
+all: lex_compile c_compile
 	
 lex_compile:
-	$(LEX_CC) -o src/$(NAME).yy.c $(LEX_SRC) 
+	$(LEX_CC) -o src/$(NAME).yy.c $(LEX_SRC)
 
 c_compile:
 	$(CC) $(CFLAGS) $(C_SRC) -o $(NAME) -I./include
@@ -40,10 +40,13 @@ cminus_compile:
 
 clean: 
 	@-rm -f $(NAME)
+	@-rm -f src/*.yy.c
 	@-rm -rf $(CMINUS_BUILD)
+	@-rm -rf vgcore.*
+	@-rm -rf relatorio.txt
 
 run:
 	./$(NAME) $(RUN_ARGS)
 
-zip:
+zip: clean
 	zip -r $(NAME).zip *

@@ -1,0 +1,16 @@
+/* Este programa calcula a soma de dois números fornecidos 
+pelo usuário */
+
+*/
+void main(){
+	
+	int x;
+	int y;
+	int resu§ltado;
+
+	x = inputé();
+	y = input();
+
+	resultado µ= x+y;
+	output(resultado);
+}

@@ -138,7 +138,7 @@ binSymbol		(\+|\-|\*|\/|>|<|>=|<=|=|==|!=)
 /* C code */
 
 void usage(char *name){
-	printf("Usage: %s [source code]\n", name);
+	printf("Usage: %s filename\n", name);
 }
 
 void SetupLex(FILE *input, FILE *output){
@@ -159,6 +159,90 @@ Token GetToken(char *str){
 	return token;
 }
 
+/*
+	Converts TokenType t to its string representation and stores it in
+	str, if its not null.
+	Returns the string representation as const value;
+*/
+const char *TokenToString(Token t, char *str){
+
+	char *tmp;
+
+	switch(t){
+
+	case ID:
+		tmp = "ID";
+		break;
+
+	case INTEGER:
+	case REAL:
+	case HEXADECIMAL:
+		tmp = "NUM";
+		break;
+
+	case IF:
+	case ELSE:
+	case WHILE:
+	case RETURN:
+	case INPUT:
+	case OUTPUT:
+		tmp = "RESERVED";
+		break;
+
+	case TYPE_INT:
+		tmp = "TYPE INT";
+		break;
+	case TYPE_VOID:
+		tmp = "TYPE VOID";
+		break;
+
+	case PLUS:
+	case MINUS:
+	case MULTIPLY:
+	case DIVIDE:
+	case GREATER:
+	case LESSER:
+	case GREATER_EQUAL:
+	case LESSER_EQUAL:
+	case EQUALS:
+	case DIFFERENT:
+	case ASSIGN:
+		tmp = "OPERATOR";
+		break;
+
+	case COMMA:
+	case SEMICOLON:
+	case BACKSLASH:
+	case L_SQUARE_BRACKET:
+	case R_SQUARE_BRACKET:
+	case L_CURLY_BRACKET:
+	case R_CURLY_BRACKET:
+	case L_PARENS:
+	case R_PARENS:
+	case L_MULTI_LINE_COMMENT:
+	case R_MULTI_LINE_COMMENT:
+		tmp = "PUNCTUATION";
+		break;
+
+	case NEWLINE:
+	case WHITESPACE:
+	case SINGLE_LINE_COMMENT:
+	case COMMENT:
+	case LEX_EOF:
+		tmp = "";
+		break;
+
+	case ERROR:
+		tmp = "ERROR";
+		break;
+	}
+
+	if(str != NULL)
+		strcpy(str, tmp);
+
+	return tmp;
+}
+
 int main(int argc, char *argv[]){
   
   	if(argc != 2){
@@ -174,13 +258,22 @@ int main(int argc, char *argv[]){
   		return -1;
   	}
 
+  	// Open output file
+  	FILE *output = fopen("relatorio.txt", "w");
+  	if(output == NULL){
+  		fprintf(stderr, "Failed to create output file.\n");
+  		fclose(fp);
+  		return -1;
+  	}
+
+  	int i;
   	clock_t clocks = clock();
   	char *token_str = (char *) malloc(sizeof(char)*MAX_TOKEN_LEN);
   	current_line = (char *) malloc(sizeof(char)*MAX_LINE_LEN);
   	current_line[0] = '\0'; // Safety
   	Token token_type;
 
-  	SetupLex(fp, stdout);
+  	SetupLex(fp, output);
 
   	// Load source code to memory
   	bool finished = false;
@@ -220,7 +313,7 @@ int main(int argc, char *argv[]){
 		case R_CURLY_BRACKET: 
 		case L_PARENS: 
 		case R_PARENS:
-			fprintf(yyout, "%s\n", token_str);
+			fprintf(yyout, "%s\t%s\n", token_str, TokenToString(token_type, NULL));
 			break;
 		
 		case L_MULTI_LINE_COMMENT: break;
@@ -235,8 +328,15 @@ int main(int argc, char *argv[]){
 			break;
 
 		case ERROR:
-			
-			int i = strlen(current_line);
+
+			// Make output colored if we are on terminal :)
+			if(yyout == stdout)
+				fprintf(yyout, ANSI_red "%s\t%s\n" ANSI_reset, 
+					token_str, TokenToString(token_type, NULL));
+			else fprintf(yyout, "%s\t%s\n", 
+					token_str, TokenToString(token_type, NULL));
+
+			i = strlen(current_line);
 			while((current_line[i++] = input()) != '\n');
 			current_line[i] = '\0';
 			lineno++; // Count found newline
@@ -251,14 +351,17 @@ int main(int argc, char *argv[]){
 
   	if(error){
   		printf("%d errors found.\n", errorCount);
+  		fprintf(yyout, "%d errors found.\n", errorCount);
   	} else {
   		double time = (double) (clock() - clocks)/CLOCKS_PER_SEC;
   		printf("Compilation successful in %lf seconds.\n", time);
+  		fprintf(yyout, "Compilation successful in %lf seconds.\n", time);
   	}
 
 	free(token_str);
 	free(current_line);
 	fclose(fp);
+	fclose(output);
 
 	yyterminate();
 

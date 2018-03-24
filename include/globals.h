@@ -1,3 +1,14 @@
+/*
+ *	Definições globais - trabalho 1 SCC0217 Linguagens de Programação e 
+ *	Compiladores
+ *	Prof. Adinovam Henriques de Macedo Pimenta
+ *
+ *	Lucas Alexandre Soares		9293265
+ *	Giovanna Oliveira Guimarães 9293693
+ *	Rafael Augusto Monteiro		9293095
+ *
+ */
+
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
